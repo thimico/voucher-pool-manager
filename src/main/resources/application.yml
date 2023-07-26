@@ -1,0 +1,8 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_DATABASE_URL:mongodb://localhost:27017/voucher-pool-manager}
+      auto-index-creation: true
+  docker:
+    compose:
+      lifecycle-management: start-only
