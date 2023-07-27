@@ -12,11 +12,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.ResultActions;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(OfertaEspecialController.class)
@@ -54,7 +58,11 @@ public class OfertaEspecialControllerTest extends ControllerTestBase {
         when(ofertaEspecialService.criarOfertaEspecial(any())).thenThrow(new ValidationException("Validation error"));
 
         // Act & Assert
-        doPost(BASE_URL, ofertaEspecialRequest, HttpStatus.BAD_REQUEST);
+        ResultActions result = doPost(BASE_URL, ofertaEspecialRequest, HttpStatus.BAD_REQUEST);
+
+        // Assert
+        result.andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Validation error")));
     }
 
     @Test
@@ -64,7 +72,11 @@ public class OfertaEspecialControllerTest extends ControllerTestBase {
         when(ofertaEspecialService.criarOfertaEspecial(any())).thenThrow(new IllegalArgumentException("Illegal argument"));
 
         // Act & Assert
-        doPost(BASE_URL, ofertaEspecialRequest, HttpStatus.BAD_REQUEST);
+        ResultActions result = doPost(BASE_URL, ofertaEspecialRequest, HttpStatus.BAD_REQUEST);
+
+        // Assert
+        result.andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Illegal argument")));
     }
 
     @Test
@@ -74,7 +86,11 @@ public class OfertaEspecialControllerTest extends ControllerTestBase {
         when(ofertaEspecialService.criarOfertaEspecial(any())).thenThrow(new RuntimeException("Unexpected error"));
 
         // Act & Assert
-        doPost(BASE_URL, ofertaEspecialRequest, HttpStatus.INTERNAL_SERVER_ERROR);
+        ResultActions result = doPost(BASE_URL, ofertaEspecialRequest, HttpStatus.INTERNAL_SERVER_ERROR);
+
+        // Assert
+        result.andExpect(status().isInternalServerError())
+                .andExpect(content().string(containsString("Unexpected error")));
     }
 
 }

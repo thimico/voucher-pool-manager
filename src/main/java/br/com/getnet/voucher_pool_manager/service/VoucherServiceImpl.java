@@ -18,7 +18,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * @author Thiago Oliveira</a>
@@ -77,7 +76,7 @@ public class VoucherServiceImpl implements VoucherService {
 
         List<Optional<Destinatario>> destinatariosOptionals = destinatariosEmails.stream()
                 .map(email -> destinatarioRepository.findByEmail(email))
-                .collect(Collectors.toList());
+                .toList();
 
         boolean anyNotFound = destinatariosOptionals.stream().anyMatch(Optional::isEmpty);
 
@@ -88,7 +87,7 @@ public class VoucherServiceImpl implements VoucherService {
         List<Destinatario> destinatarios = destinatariosOptionals.stream()
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toList());
+                .toList();
 
         try {
                 List<Voucher> vouchers = destinatarios.stream()
@@ -101,7 +100,7 @@ public class VoucherServiceImpl implements VoucherService {
                             voucher.setStatus(VoucherStatus.ATV);
                             return voucherRepository.save(voucher);
                         })
-                        .collect(Collectors.toList());
+                        .toList();
 
             return vouchers;
         } catch (RuntimeException e) {
@@ -137,7 +136,7 @@ public class VoucherServiceImpl implements VoucherService {
             voucherRepository.save(voucher);
             return voucher.getOfertaEspecial().getDesconto();
         } else {
-            throw new RuntimeException("Voucher inválido");
+            throw new ValidationException("Voucher inválido");
         }
     }
 

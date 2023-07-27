@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static br.com.getnet.voucher_pool_manager.controller.VoucherController.VOUCHER_URL;
 @RestController
@@ -62,7 +61,7 @@ public class VoucherController {
 
         List<VoucherResponse> response = vouchers.stream()
                 .map(voucher -> modelMapper.map(voucher, VoucherResponse.class))
-                .collect(Collectors.toList());
+                .toList();
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

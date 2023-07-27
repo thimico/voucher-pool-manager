@@ -16,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -23,9 +24,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(VoucherController.class)
@@ -74,7 +78,11 @@ public class VoucherControllerTests extends ControllerTestBase {
         when(voucherService.gerarVoucherParaDestinatario(any(String.class), any(String.class), any())).thenThrow(new ValidationException("Validation error"));
 
         // Act & Assert
-        doPost(BASE_URL, voucherRequest, HttpStatus.BAD_REQUEST);
+        ResultActions result = doPost(BASE_URL, voucherRequest, HttpStatus.BAD_REQUEST);
+
+        // Assert
+        result.andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Invalid request")));
     }
 
     @Test
@@ -84,7 +92,11 @@ public class VoucherControllerTests extends ControllerTestBase {
         when(voucherService.gerarVoucherParaDestinatario(any(String.class), any(String.class), any())).thenThrow(new IllegalArgumentException("Illegal argument"));
 
         // Act & Assert
-        doPost(BASE_URL, voucherRequest, HttpStatus.BAD_REQUEST);
+        ResultActions result = doPost(BASE_URL, voucherRequest, HttpStatus.BAD_REQUEST);
+
+        // Assert
+        result.andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Invalid request")));
     }
 
     @Test
@@ -94,7 +106,11 @@ public class VoucherControllerTests extends ControllerTestBase {
         when(voucherService.gerarVoucherParaDestinatario(any(String.class), any(String.class), any())).thenThrow(new RuntimeException("Unexpected error"));
 
         // Act & Assert
-        doPost(BASE_URL, voucherRequest, HttpStatus.BAD_REQUEST);
+        ResultActions result = doPost(BASE_URL, voucherRequest, HttpStatus.BAD_REQUEST);
+
+        // Assert
+        result.andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Invalid request")));
     }
 
     @Test

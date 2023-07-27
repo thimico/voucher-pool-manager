@@ -106,6 +106,7 @@ public class ControllerTestBase {
      */
     protected ResultActions doGet(String url, HttpStatus expectedStatus, Object... uriVars) throws Exception {
         return doRequest(get(url, uriVars)
+                        .header("Authorization", "Bearer " + "token")
                         .contentType(MediaType.APPLICATION_JSON),
                 expectedStatus);
     }
@@ -142,6 +143,7 @@ public class ControllerTestBase {
     protected ResultActions doPost(String url, Object body, HttpStatus expectedStatus, Object... uriVars) throws Exception {
         return doRequest(
                 post(url, uriVars)
+                        .header("Authorization", "Bearer " + "token")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(body)),
                 expectedStatus);
@@ -149,6 +151,7 @@ public class ControllerTestBase {
 
     protected <T> T doPostWithResponse(String url, Object body, HttpStatus expectedStatus, Class<T> responseClass, Object... uriVars) throws Exception {
         MvcResult mvcResult = mockMvc.perform(post(url, uriVars)
+                        .header("Authorization", "Bearer " + "token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().is(expectedStatus.value()))
@@ -182,6 +185,7 @@ public class ControllerTestBase {
 
     protected <T> T doPost(String url, Object body, HttpStatus expectedStatus, Class<T> responseClass, Object... uriVars) throws Exception {
         MvcResult mvcResult = mockMvc.perform(post(url, uriVars)
+                        .header("Authorization", "Bearer " + "token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().is(expectedStatus.value()))
@@ -211,6 +215,7 @@ public class ControllerTestBase {
      */
     protected ResultActions doPut(String url, Object body, HttpStatus expectedStatus, Object... uriVars) throws Exception {
         return doRequest(put(url, uriVars)
+                        .header("Authorization", "Bearer " + "token")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(body)),
                 expectedStatus);

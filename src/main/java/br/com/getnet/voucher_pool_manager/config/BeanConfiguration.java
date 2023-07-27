@@ -3,9 +3,11 @@ package br.com.getnet.voucher_pool_manager.config;
 import br.com.getnet.voucher_pool_manager.model.commons.MappingToModel;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -13,7 +15,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 
 @Configuration
-public class BeanConfiguration {
+public class BeanConfiguration implements WebMvcConfigurer {
+
+    @Autowired
+    private UserInterceptor userInterceptor;
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
@@ -32,6 +37,11 @@ public class BeanConfiguration {
         modelMapper.addConverter(new MappingToModel.StringToLocalDateConverter());
         modelMapper.addMappings(MappingToModel.mapVoucherRequestToVoucher);
         return modelMapper;
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(userInterceptor);
     }
 
 

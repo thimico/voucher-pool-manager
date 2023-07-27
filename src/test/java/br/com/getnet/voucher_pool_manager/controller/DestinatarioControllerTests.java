@@ -12,11 +12,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.ResultActions;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(DestinatarioController.class)
@@ -52,10 +56,16 @@ public class DestinatarioControllerTests extends ControllerTestBase {
     public void shouldReturnBadRequestWhenValidationExceptionIsThrown() throws Exception {
         // Arrange
         DestinatarioRequest destinatarioRequest = easyRandom.nextObject(DestinatarioRequest.class);
+        destinatarioRequest.setEmail("john.doe@example.com");
         when(destinatarioService.criarDestinatario(any())).thenThrow(new ValidationException("Validation error"));
 
         // Act & Assert
-        doPost(BASE_URL, destinatarioRequest, HttpStatus.BAD_REQUEST);
+        ResultActions result = doPost(BASE_URL, destinatarioRequest, HttpStatus.BAD_REQUEST);
+
+        // Assert
+        result.andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Validation error")));
+
     }
 
     @Test
@@ -65,7 +75,11 @@ public class DestinatarioControllerTests extends ControllerTestBase {
         when(destinatarioService.criarDestinatario(any())).thenThrow(new IllegalArgumentException("Illegal argument"));
 
         // Act & Assert
-        doPost(BASE_URL, destinatarioRequest, HttpStatus.BAD_REQUEST);
+        ResultActions result = doPost(BASE_URL, destinatarioRequest, HttpStatus.BAD_REQUEST);
+
+        // Assert
+        result.andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Invalid request")));
     }
 
     @Test
@@ -75,7 +89,11 @@ public class DestinatarioControllerTests extends ControllerTestBase {
         when(destinatarioService.criarDestinatario(any())).thenThrow(new RuntimeException("Unexpected error"));
 
         // Act & Assert
-        doPost(BASE_URL, destinatarioRequest, HttpStatus.BAD_REQUEST);
+        ResultActions result = doPost(BASE_URL, destinatarioRequest, HttpStatus.BAD_REQUEST);
+
+        // Assert
+        result.andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Invalid request")));
     }
 
 
