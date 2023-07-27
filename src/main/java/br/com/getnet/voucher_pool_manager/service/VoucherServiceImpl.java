@@ -119,7 +119,12 @@ public class VoucherServiceImpl implements VoucherService {
     @Override
     @Transactional
     public Integer usarVoucher(String codigo, String email) {
-        Optional<Voucher> optionalVoucher = voucherRepository.findByCodigoAndDestinatarioEmailAndDataUsoIsNull(codigo, email);
+        Optional<Destinatario> destinatarioOptional = destinatarioRepository.findByEmail(email);
+
+        if (!destinatarioOptional.isPresent()) {
+            throw new EntityNotFoundException("Destinatário com email " + email + " não encontrado.");
+        }
+        Optional<Voucher> optionalVoucher = voucherRepository.findByCodigoAndDestinatarioAndDataUsoIsNull(codigo, destinatarioOptional.get());
 
         if (!optionalVoucher.isPresent()) {
             throw new ValidationException("Voucher inválido");

@@ -126,6 +126,43 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Usar Voucher",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"nome\": \"Nome do Destinatario\",\n    \"email\": \"destinatario1@email.com\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/vouchers/:codigo",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"vouchers",
+						":codigo"
+					],
+					"variable": [
+						{
+							"key": "codigo",
+							"value": "A8C04E59"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"event": [

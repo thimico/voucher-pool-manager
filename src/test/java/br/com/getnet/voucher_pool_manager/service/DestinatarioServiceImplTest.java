@@ -2,8 +2,6 @@ package br.com.getnet.voucher_pool_manager.service;
 
 import br.com.getnet.voucher_pool_manager.domain.Destinatario;
 import br.com.getnet.voucher_pool_manager.repos.DestinatarioRepository;
-import com.mongodb.DuplicateKeyException;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ValidationException;
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.*;
@@ -12,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

@@ -8,10 +8,6 @@ import br.com.getnet.voucher_pool_manager.repos.DestinatarioRepository;
 import br.com.getnet.voucher_pool_manager.repos.OfertaEspecialRepository;
 import br.com.getnet.voucher_pool_manager.repos.VoucherRepository;
 import jakarta.persistence.EntityNotFoundException;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-
-
-import jakarta.validation.ValidationException;
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,6 +21,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
 /**
@@ -153,17 +150,24 @@ public class VoucherServiceImplTest {
             String codigo = "testCode";
             String email = "test@test.com";
 
-            when(voucherRepository.findByCodigoAndDestinatarioEmailAndDataUsoIsNull(codigo, email)).thenReturn(Optional.empty());
+            Destinatario destinatario = new Destinatario();
+            destinatario.setEmail(email);
 
             assertThatThrownBy(() -> unitUnderTest.usarVoucher(codigo, email))
-                    .isInstanceOf(ValidationException.class)
-                    .hasMessage("Voucher inválido");
+                    .isInstanceOf(EntityNotFoundException.class)
+                    .hasMessage("Destinatário com email test@test.com não encontrado.");
         }
+
 
         @Test
         void usarVoucherSuccess() {
             String codigo = "testCode";
             String email = "test@test.com";
+
+            // Create Destinatario
+            Destinatario destinatario = new Destinatario();
+            destinatario.setEmail(email);
+
             Voucher voucher = easyRandom.nextObject(Voucher.class);
             voucher.setCodigo(codigo);
             voucher.setStatus(VoucherStatus.ATV);
@@ -172,12 +176,18 @@ public class VoucherServiceImplTest {
             ofertaEspecial.setDesconto(10);
             voucher.setOfertaEspecial(ofertaEspecial);
 
-            when(voucherRepository.findByCodigoAndDestinatarioEmailAndDataUsoIsNull(codigo, email)).thenReturn(Optional.of(voucher));
+            when(destinatarioRepository.findByEmail(email)).thenReturn(Optional.of(destinatario));
+            when(voucherRepository.findByCodigoAndDestinatarioAndDataUsoIsNull(codigo, destinatario)).thenReturn(Optional.of(voucher));
             when(voucherRepository.save(any())).thenReturn(voucher);
 
             Integer result = unitUnderTest.usarVoucher(codigo, email);
             assertThat(result).isEqualTo(ofertaEspecial.getDesconto());
+
+            assertThat(voucher.getStatus()).isEqualTo(VoucherStatus.USD);
+            assertThat(voucher.getDataUso()).isNotNull();
         }
+
+
 
     }
 }

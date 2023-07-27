@@ -2,8 +2,6 @@ package br.com.getnet.voucher_pool_manager.service;
 
 import br.com.getnet.voucher_pool_manager.domain.OfertaEspecial;
 import br.com.getnet.voucher_pool_manager.repos.OfertaEspecialRepository;
-import br.com.getnet.voucher_pool_manager.repos.OfertaEspecialRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

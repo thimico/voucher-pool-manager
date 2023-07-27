@@ -2,7 +2,6 @@ package br.com.getnet.voucher_pool_manager.service;
 
 import br.com.getnet.voucher_pool_manager.domain.OfertaEspecial;
 import br.com.getnet.voucher_pool_manager.repos.OfertaEspecialRepository;
-import jakarta.validation.ValidationException;
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 /**

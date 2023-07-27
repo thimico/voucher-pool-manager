@@ -2,9 +2,7 @@ package br.com.getnet.voucher_pool_manager.service;
 
 import br.com.getnet.voucher_pool_manager.domain.Destinatario;
 import br.com.getnet.voucher_pool_manager.repos.DestinatarioRepository;
-import com.mongodb.DuplicateKeyException;
 import jakarta.validation.ValidationException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
