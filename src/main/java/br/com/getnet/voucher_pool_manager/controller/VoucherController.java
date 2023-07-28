@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static br.com.getnet.voucher_pool_manager.controller.VoucherController.VOUCHER_URL;
 @RestController
@@ -78,6 +79,23 @@ public class VoucherController {
         Destinatario destinatario = modelMapper.map(destinatarioRequest, Destinatario.class);
         voucherService.usarVoucher(codigo, destinatario.getEmail());
         return ResponseEntity.noContent().build();
+    }
+
+    @ApiOperation(value = "Busca todos os vouchers válidos para um determinado e-mail")
+    @GetMapping("/valid")
+    public List<VoucherResponse> getValidVouchers(
+            @ApiParam(value = "E-mail do destinatário para o qual os vouchers válidos serão retornados", required = true)
+            @RequestParam("email") String email) {
+
+        List<Voucher> vouchers = voucherService.findValidVouchersByEmail(email);
+
+        return vouchers.stream()
+                .map(this::convertToVoucherResponse)
+                .collect(Collectors.toList());
+    }
+
+    private VoucherResponse convertToVoucherResponse(Voucher voucher) {
+        return modelMapper.map(voucher, VoucherResponse.class);
     }
 
 }

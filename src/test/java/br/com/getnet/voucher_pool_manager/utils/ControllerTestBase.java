@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.function.Consumer;
 
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -105,11 +106,21 @@ public class ControllerTestBase {
      * @throws Exception if something goes wrong
      */
     protected ResultActions doGet(String url, HttpStatus expectedStatus, Object... uriVars) throws Exception {
-        return doRequest(get(url, uriVars)
-                        .header("Authorization", "Bearer " + "token")
-                        .contentType(MediaType.APPLICATION_JSON),
-                expectedStatus);
+        try {
+            return doRequest(get(url, uriVars)
+                            .header("Authorization", "Bearer " + "token")
+                            .contentType(MediaType.APPLICATION_JSON),
+                    expectedStatus);
+        } catch (Exception e) {
+            // If any exception occurs, fail the test with a specific message.
+            // This will help you identify the cause of the failure.
+            String message = "Exception occurred during doGet: " + e.getMessage();
+            fail(message);
+            // Return null to satisfy the method signature. The code will never reach here if the test fails.
+            return null;
+        }
     }
+
 
     /**
      * Performs a GET and returns the parsed response object.

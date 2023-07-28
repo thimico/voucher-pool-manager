@@ -16,12 +16,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -187,6 +189,33 @@ public class VoucherServiceImplTest {
             assertThat(voucher.getDataUso()).isNotNull();
         }
 
+        @Test
+        public void findValidVouchersByEmail_Success() {
+            String codigo = "testCode";
+            Destinatario destinatario = new Destinatario();
+            destinatario.setEmail("test@test.com");
+            Voucher voucher = easyRandom.nextObject(Voucher.class);
+            voucher.setCodigo(codigo);
+            voucher.setStatus(VoucherStatus.ATV);
+            voucher.setValidade(LocalDate.now().plusDays(1));
+            when(destinatarioRepository.findByEmail(destinatario.getEmail())).thenReturn(Optional.of(destinatario));
+            when(voucherRepository.findByDestinatarioAndValidadeAfter(destinatario, LocalDate.now())).thenReturn(Collections.singletonList(voucher));
+
+            List<Voucher> vouchers = unitUnderTest.findValidVouchersByEmail(destinatario.getEmail());
+
+            org.hamcrest.MatcherAssert.assertThat(vouchers, hasSize(1));
+            assertEquals(vouchers.get(0), voucher);
+        }
+
+        @Test
+        public void findValidVouchersByEmail_Failure() {
+            when(destinatarioRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+
+            assertThrows(EntityNotFoundException.class, () -> {
+                unitUnderTest.findValidVouchersByEmail("unknown@test.com");
+            });
+
+        }
 
 
     }

@@ -19,4 +19,5 @@ public interface VoucherService {
     @Transactional
     Integer usarVoucher(String codigo, String email);
 
+    List<Voucher> findValidVouchersByEmail(String email);
 }

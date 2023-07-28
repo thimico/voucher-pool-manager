@@ -140,4 +140,12 @@ public class VoucherServiceImpl implements VoucherService {
         }
     }
 
+    @Override
+    public List<Voucher> findValidVouchersByEmail(String email) {
+        Destinatario destinatario = destinatarioRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("Destinatário com email " + email + " não encontrado."));
+
+        return voucherRepository.findByDestinatarioAndValidadeAfter(destinatario, LocalDate.now());
+    }
+
 }

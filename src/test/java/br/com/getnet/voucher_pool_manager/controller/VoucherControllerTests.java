@@ -3,12 +3,10 @@ package br.com.getnet.voucher_pool_manager.controller;
 import br.com.getnet.voucher_pool_manager.domain.Destinatario;
 import br.com.getnet.voucher_pool_manager.domain.OfertaEspecial;
 import br.com.getnet.voucher_pool_manager.domain.Voucher;
-import br.com.getnet.voucher_pool_manager.model.DestinatarioRequest;
-import br.com.getnet.voucher_pool_manager.model.VoucherPoolRequest;
-import br.com.getnet.voucher_pool_manager.model.VoucherRequest;
-import br.com.getnet.voucher_pool_manager.model.VoucherResponse;
+import br.com.getnet.voucher_pool_manager.model.*;
 import br.com.getnet.voucher_pool_manager.service.VoucherService;
 import br.com.getnet.voucher_pool_manager.utils.ControllerTestBase;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,14 +20,14 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(VoucherController.class)
@@ -166,6 +164,40 @@ public class VoucherControllerTests extends ControllerTestBase {
     }
 
 
+    @Test
+    public void getValidVouchers_Success() throws Exception {
+        String mail = "test@test.com";
 
+        Voucher voucher = new Voucher();
+        voucher.setStatus(VoucherStatus.ATV);
+        Destinatario destinatario = new Destinatario();
+        destinatario.setEmail(mail);
+        voucher.setDestinatario(destinatario);
+        voucher.setValidade(LocalDate.now().plusDays(1));
+
+        VoucherResponse voucherResponse = new VoucherResponse();
+        voucherResponse.setValidade(voucher.getValidade());
+        voucherResponse.setStatus(voucher.getStatus());
+
+        when(voucherService.findValidVouchersByEmail(anyString())).thenReturn(Collections.singletonList(voucher));
+
+        when(modelMapper.map(voucher, VoucherResponse.class)).thenReturn(voucherResponse);
+
+        ResultActions result = doGet(BASE_URL + "/valid?email=" + mail, HttpStatus.OK);
+        LocalDate validadeDate = voucherResponse.getValidade();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String validadeString = validadeDate.format(formatter);
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].status").value(voucherResponse.getStatus().getName()))
+                .andExpect(jsonPath("$[0].validade").value(validadeString));
+    }
+
+
+    @Test
+    public void getValidVouchers_Failure() throws Exception {
+        when(voucherService.findValidVouchersByEmail(anyString())).thenThrow(new EntityNotFoundException("No vouchers found."));
+
+        doGet(BASE_URL + "/valid?email=" + "unknown@test.com", HttpStatus.NOT_FOUND);
+    }
 
 }
